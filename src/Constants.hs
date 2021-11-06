@@ -43,13 +43,13 @@ createElementFunction = "createElement"
 createAttributeFunction :: Text
 createAttributeFunction = "createAttribute"
 
-voidTags :: Set Text
-voidTags =
+childFreeTags :: Set Text
+childFreeTags =
     DS.fromList
         [ "area"
         , "base"
-        , "doctype"
         , "br"
+        , "doctype"
         , "col"
         , "command"
         , "embed"
@@ -64,6 +64,9 @@ voidTags =
         , "track"
         , "wbr"
         ]
+
+attributeFreeTags :: Set Text
+attributeFreeTags = DS.fromList ["br", "hr"]
 
 knownTags :: Set Text
 knownTags =
