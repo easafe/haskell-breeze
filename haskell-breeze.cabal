@@ -6,13 +6,13 @@ cabal-version: 1.12
 
 name:           haskell-breeze
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/haskell-breeze#readme>
-homepage:       https://github.com/githubuser/haskell-breeze#readme
-bug-reports:    https://github.com/githubuser/haskell-breeze/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
-license:        BSD3
+description:    Please see the README on GitHub at <https://github.com/easafe/haskell-breeze#readme>
+homepage:       https://github.com/easafe/haskell-breeze#readme
+bug-reports:    https://github.com/easafe/haskell-breeze/issues
+author:         Eduardo Asafe
+maintainer:     e@asafe.dev
+copyright:      2021 Eduardo Asafe
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
@@ -21,17 +21,24 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/haskell-breeze
+  location: https://github.com/easafe/haskell-breeze
 
 library
   exposed-modules:
-      Lib
+      Breeze
+      Constants
   other-modules:
       Paths_haskell_breeze
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , casing
+    , containers
+    , hspec
+    , tagsoup
+    , text
+    , unordered-containers
   default-language: Haskell2010
 
 executable haskell-breeze-exe
@@ -43,7 +50,13 @@ executable haskell-breeze-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
+    , containers
     , haskell-breeze
+    , hspec
+    , tagsoup
+    , text
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite haskell-breeze-test
@@ -56,5 +69,11 @@ test-suite haskell-breeze-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
+    , containers
     , haskell-breeze
+    , hspec
+    , tagsoup
+    , text
+    , unordered-containers
   default-language: Haskell2010

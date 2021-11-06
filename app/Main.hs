@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Breeze
 
 main :: IO ()
-main = someFunc
+main = print 3
