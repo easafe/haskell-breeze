@@ -10,6 +10,18 @@ import Data.Text (Text)
 
 type ShouldValueBeQuoted = Bool
 
+newline :: Text
+newline = "\n"
+
+moduleName :: Text
+moduleName = "module Breeze.Output where" <> newline
+
+importList :: Text -> Text -> Text
+importList elementsName attributesName = "import Flame (Html)" <> newline <> "import Flame.Html.Element as " <> elementsName <> newline <> "import Flame.Html.Attribute as " <> attributesName <> newline
+
+viewFunction :: Text
+viewFunction = "view :: forall model message. model -> Html message" <> newline <> "view model = "
+
 openBracket :: Text
 openBracket = "["
 
@@ -35,7 +47,7 @@ emptyText :: Text
 emptyText = ""
 
 unmatchedTag :: Text
-unmatchedTag = "Unmatched tags: "
+unmatchedTag = "Unmatched tag: "
 
 createElementFunction :: Text
 createElementFunction = "createElement"
@@ -287,6 +299,7 @@ knownAttributes =
         , ("calc-mode", True)
         , ("charset", True)
         , ("checked", False)
+        , ("class", True)
         , ("clip-path-attr", True)
         , ("clip-path-units", True)
         , ("clip-rule", True)
@@ -475,8 +488,7 @@ knownAttributes =
         , ("stroke-miterlimit", True)
         , ("stroke-opacity", True)
         , ("stroke-width", True)
-        , ("style", True)
-        , ("style-attr", True)
+        , ("style", False)
         , ("surface-scale", True)
         , ("tabindex", False)
         , ("target", True)

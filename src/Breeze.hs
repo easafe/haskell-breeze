@@ -4,10 +4,26 @@
 module Breeze (
     render,
     Options (..),
-    defaultOptions
+    defaultOptions,
 ) where
 
-import Constants (closeBracket, comma, createAttributeFunction, createElementFunction, dot, emptyText, knownAttributes, knownTags, openBracket, quote, space, unmatchedTag, textFunction, childFreeTags)
+import Constants (
+    attributeFreeTags,
+    childFreeTags,
+    closeBracket,
+    comma,
+    createAttributeFunction,
+    createElementFunction,
+    dot,
+    emptyText,
+    knownAttributes,
+    knownTags,
+    openBracket,
+    quote,
+    space,
+    textFunction,
+    unmatchedTag, viewFunction, moduleName, newline, importList
+ )
 import qualified Data.HashMap.Strict as DHS
 import qualified Data.List as DL
 import qualified Data.Set as DS
@@ -15,26 +31,42 @@ import Data.Text (Text)
 import qualified Data.Text as DT
 import Text.Casing as TC
 import Text.HTML.TagSoup (Tag (..))
-import Text.HTML.TagSoup.Tree (TagTree(..))
+import Text.HTML.TagSoup.Tree (TagTree (..))
 import qualified Text.HTML.TagSoup.Tree as THTT
 
+-- | Options for the rendering process
 data Options = Options
     { ignoreErrors :: Bool
+    , standaloneModule :: Bool
     , elementModuleName :: Text
     , attributeModuleName :: Text
     }
 
+{- |
+    Default options
+  - Error at malformed input
+  - Output is printed to console
+  - HE as element module name
+  - HA as attribute module name
+-}
 defaultOptions :: Options
-defaultOptions = Options
-    { ignoreErrors = False
-    , elementModuleName = "HE"
-    , attributeModuleName = "HA"
-    }
+defaultOptions =
+    Options
+        { ignoreErrors = False
+        , standaloneModule = False
+        , elementModuleName = "HE"
+        , attributeModuleName = "HA"
+        }
 
+-- | Renders HTML to Flame markup
 render :: Text -> Options -> Text
-render rawHtml = renderHtml (THTT.parseTree rawHtml)
+render rawHtml options = renderModule options <> renderHtml (THTT.parseTree rawHtml) options
 
---restore all test and fixes
+{- |
+    Renders a HTML tree into text
+
+    No effort is made to use sugar syntax, all nodes are rendered as HE.name [] []
+-}
 renderHtml :: [TagTree Text] -> Options -> Text
 renderHtml tree Options{ignoreErrors, elementModuleName, attributeModuleName} = flattenTree tree
   where
@@ -46,26 +78,34 @@ renderHtml tree Options{ignoreErrors, elementModuleName, attributeModuleName} = 
             TagLeaf tag ->
                 case tag of
                     TagOpen name attributes
-                        | DS.member name childFreeTags -> renderTag name attributes
+                        | DS.member name childFreeTags -> renderTag name attributes -- tags like input cannot have child nodes
                         | otherwise ->
                             if ignoreErrors
-                                then emptyText
+                                then renderTag name attributes
                                 else error . DT.unpack $ unmatchedTag <> name
                     TagText text -> includeNode textFunction <> quoteIt text
                     _ -> emptyText
 
-    renderTag name attributes = dslName name <> space <> dslAttributes attributes
+    renderTag name attributes = dslName name <> dslAttributes name attributes
 
-    dslName tag = elementModuleName <> dot <> if DS.member tag knownTags then tag else createElementFunction <> space <> tag
-
-    dslAttributes attributes = openBracket <> DT.intercalate comma (map makeAttribute attributes) <> closeBracket
+    dslName tag
+        | DS.member tag knownTags = includeNode tag
+        | otherwise = includeNode $ createElementFunction <> space <> quoteIt tag -- include unknown tags with HE.createElement
+    dslAttributes name attributes
+        | DS.member name attributeFreeTags = emptyText
+        | otherwise = openBracket <> DT.intercalate comma (map makeAttribute attributes) <> closeBracket
 
     makeAttribute (name, value) = case DHS.lookup name knownAttributes of
-        Nothing -> includeAttribute createAttributeFunction <> name <> space <> value
-        Just shouldBeQuoted -> includeAttribute (DT.pack . TC.camel $ DT.unpack name) <> if shouldBeQuoted then quoteIt value else value
-
+        Nothing -> includeAttribute createAttributeFunction <> quoteIt name <> space <> quoteIt value -- include unknown attributes with HA.createAttributes
+        Just shouldBeQuoted -> includeAttribute (DT.pack . TC.camel $ DT.unpack name) <> if shouldBeQuoted then quoteIt value else value -- quotes should not be added for boolean or numeric attributes
     quoteIt value = quote <> value <> quote
 
     includeNode name = elementModuleName <> dot <> name <> space
 
     includeAttribute name = attributeModuleName <> dot <> name <> space
+
+-- | Includes code for a standalone module
+renderModule :: Options -> Text
+renderModule Options{standaloneModule, elementModuleName, attributeModuleName}
+    | standaloneModule = moduleName <> newline <> importList elementModuleName attributeModuleName <> newline <> viewFunction
+    | otherwise = emptyText
