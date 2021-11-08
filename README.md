@@ -1,4 +1,4 @@
-# haskell-breeze
+# haskell-breeze [![CI](https://github.com/easafe/haskell-breeze/actions/workflows/CI.yml/badge.svg)](https://github.com/easafe/haskell-breeze/actions/workflows/CI.yml)
 
 Command line tool to convert HTML into purescript-flame DSL
 
