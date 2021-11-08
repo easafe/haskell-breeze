@@ -10,6 +10,9 @@ import Data.Text (Text)
 
 type ShouldValueBeQuoted = Bool
 
+acceptedFileExtensions :: Set Text
+acceptedFileExtensions = DS.fromList ["html", "htm", "xml"]
+
 newline :: Text
 newline = "\n"
 

@@ -6,7 +6,7 @@ Command line tool to convert HTML into purescript-flame DSL
 
 ```breeze input [<flags>]```
 
-```input``` can be either a HTML file (extension ```.html```, ```.htm``` or ```.xml```) or HTML snippet
+```input``` can be either a HTML string or a HTML file (extension ```.html```, ```.htm``` or ```.xml```)
 
 Available flags:
 

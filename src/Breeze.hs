@@ -3,8 +3,7 @@
 
 module Breeze (
     render,
-    Options (..),
-    defaultOptions,
+    Options (..)
 ) where
 
 import Constants (
@@ -36,27 +35,13 @@ import qualified Text.HTML.TagSoup.Tree as THTT
 
 -- | Options for the rendering process
 data Options = Options
-    { ignoreErrors :: Bool
+    { input :: Text
+    , ignoreErrors :: Bool
     , standaloneModule :: Bool
     , elementModuleName :: Text
     , attributeModuleName :: Text
+    , outputFile :: Maybe FilePath
     }
-
-{- |
-    Default options
-  - Error at malformed input
-  - Output is printed to console
-  - HE as element module name
-  - HA as attribute module name
--}
-defaultOptions :: Options
-defaultOptions =
-    Options
-        { ignoreErrors = False
-        , standaloneModule = False
-        , elementModuleName = "HE"
-        , attributeModuleName = "HA"
-        }
 
 -- | Renders HTML to Flame markup
 render :: Text -> Options -> Text

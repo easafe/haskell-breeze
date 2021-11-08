@@ -36,6 +36,7 @@ library
     , casing
     , containers
     , hspec
+    , optparse-applicative
     , tagsoup
     , text
     , unordered-containers
@@ -54,6 +55,7 @@ executable haskell-breeze-exe
     , containers
     , haskell-breeze
     , hspec
+    , optparse-applicative
     , tagsoup
     , text
     , unordered-containers
@@ -73,6 +75,7 @@ test-suite haskell-breeze-test
     , containers
     , haskell-breeze
     , hspec
+    , optparse-applicative
     , tagsoup
     , text
     , unordered-containers

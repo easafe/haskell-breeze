@@ -2,8 +2,19 @@
 
 import Test.Hspec
 import qualified Breeze as B
-import Breeze (defaultOptions, Options(..))
+import Breeze (Options(..))
 import Control.Exception as CE
+
+defaultOptions :: Options
+defaultOptions =
+    Options
+        { input = ""
+        , ignoreErrors = False
+        , standaloneModule = False
+        , elementModuleName = "HE"
+        , attributeModuleName = "HA"
+        , outputFile = Nothing
+        }
 
 main :: IO ()
 main = hspec $ do

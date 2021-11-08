@@ -27,6 +27,7 @@ dependencies:
 - unordered-containers
 - casing
 - hspec
+- optparse-applicative
 
 library:
   source-dirs: src
