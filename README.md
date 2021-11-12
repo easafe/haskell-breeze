@@ -2,6 +2,10 @@
 
 Command line tool to convert HTML into purescript-flame DSL
 
+## Install
+
+```npm install -g @easafe/breeze```
+
 ## Usage
 
 ```breeze input [<flags>]```
