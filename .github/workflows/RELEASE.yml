@@ -1,4 +1,4 @@
-name: Stan Release
+name: RELEASE
 
 on:
   # Trigger the workflow on the new 'v*' tag created
@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v2
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1.1.4
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -28,7 +28,7 @@ jobs:
       - name: Output Release URL File
         run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
       - name: Save Release URL File for publish
-        uses: actions/upload-artifact@v2.2.4
+        uses: actions/upload-artifact@v2
         with:
           name: release_url
           path: release_url.txt
@@ -49,14 +49,13 @@ jobs:
         uses: actions/checkout@v2.4.0
 
       - name: Set tag name
-        uses: olegtarasov/get-tag@v2
+        uses: olegtarasov/get-tag@v2.1
         id: tag
         with:
           tagRegex: "v(.*)"
-          tagRegexGroup: 1
 
       - name: Setup Haskell
-        uses: haskell/actions/setup@v1.2.6
+        uses: haskell/actions/setup@v1
         id: setup-haskell-cabal
         with:
           ghc-version: ${{ matrix.ghc }}
@@ -67,45 +66,56 @@ jobs:
           cabal freeze
 
       - name: Cache ~/.cabal/store
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2
         with:
           path: ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
           key: ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
 
-      - name: Build binary
-        run: |
-          mkdir dist
-          cabal install exe:breeze --install-method=copy --overwrite-policy=always --installdir=dist
-
       - if: matrix.os == 'windows-latest'
         name: Set extension to .exe on Windows
-        run: echo "::set-env name=EXT::.exe"
+        run: echo "EXT=.exe" >> $env:GITHUB_ENV
 
-      - name: Set binary path name
-        run: echo "::set-env name=BINARY_PATH::./dist/breeze${{ env.EXT }}"
+      - name: Build binary
+        run: |
+          mkdir -p dist/breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}
+          cabal install exe:haskell-breeze-exe --install-method=copy --overwrite-policy=always --installdir=dist
+          mv ./dist/haskell-breeze-exe${{ env.EXT }} ./dist/breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}/breeze${{ env.EXT }}
 
       - name: Compress binary
         uses: svenstaro/upx-action@2.0.1
         with:
-          file: ${{ env.BINARY_PATH }}
+          file: ./dist/breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}/breeze${{ env.EXT }}
+
+      - name: zip it
+        uses: thedoctor0/zip-release@master
+        with:
+          type: 'tar'
+          directory: ./dist
+          path: breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}/breeze${{ env.EXT }}
+          filename: breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}.tar.gz
 
       - name: Load Release URL File from release job
-        uses: actions/download-artifact@v2.0.10
+        uses: actions/download-artifact@v2
+        with:
+          name: release_url
+
+      - name: Downdload Release File Name & Upload URL
+        uses: actions/download-artifact@v2
         with:
           name: release_url
 
       - name: Get Release File Name & Upload URL
         id: get_release_info
         run: |
-          echo "::set-output name=upload_url::$(cat release_url/release_url.txt)"
+          echo "::set-output name=upload_url::$(cat release_url.txt)"
 
       - name: Upload Release Asset
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1.0.2
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release_info.outputs.upload_url }}
-          asset_path: ${{ env.BINARY_PATH }}
-          asset_name: stan-${{ steps.tag.outputs.tag }}-${{ runner.os }}-ghc-${{ matrix.ghc }}${{ env.EXT }}
-          asset_content_type: application/octet-stream
+          asset_path: ./dist/breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}.tar.gz
+          asset_name: breeze-${{ steps.tag.outputs.tag }}-${{ runner.os }}.tar.gz
+          asset_content_type: application/gzip
