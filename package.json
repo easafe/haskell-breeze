@@ -1,0 +1,30 @@
+{
+  "name": "@easafe/breeze",
+  "version": "0.7.0",
+  "description": "Command line tool to convert HTML into purescript-flame DSL",
+  "bin": {
+    "breeze": "./npm/run.js"
+  },
+  "scripts": {
+    "postinstall": "node npm/install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/easafe/haskell-breeze"
+  },
+  "author": "Eduardo Asafe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/easafe/haskell-breeze/issues"
+  },
+  "homepage": "https://github.com/easafe/haskell-breeze#readme",
+  "dependencies": {
+    "binary-install": "^0.1.1"
+  },
+  "main": "npm/binary.js",
+  "files": [
+    "npm/**/*"
+  ],
+
+  "devDependencies": {}
+}
