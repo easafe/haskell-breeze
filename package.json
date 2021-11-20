@@ -1,6 +1,6 @@
 {
   "name": "@easafe/breeze",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Command line tool to convert HTML into purescript-flame DSL",
   "bin": {
     "breeze": "./npm/run.js"
